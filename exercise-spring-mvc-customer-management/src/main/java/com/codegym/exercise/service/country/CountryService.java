@@ -24,8 +24,8 @@ public class CountryService implements ICountryService {
     }
 
     @Override
-    public void save(Country country) {
-        countryRepository.save(country);
+    public Country save(Country country) {
+       return countryRepository.save(country);
     }
 
     @Override

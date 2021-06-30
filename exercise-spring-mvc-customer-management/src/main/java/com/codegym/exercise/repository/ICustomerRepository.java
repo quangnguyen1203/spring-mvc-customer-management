@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ICustomerRepository extends PagingAndSortingRepository<Customer, Long> {
     Iterable<Customer> findAllByCountry(Country country);
+    Iterable<Customer> findAllByOrderByIdDesc();
 }

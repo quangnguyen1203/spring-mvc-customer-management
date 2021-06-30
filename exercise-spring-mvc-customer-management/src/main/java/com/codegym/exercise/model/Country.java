@@ -1,5 +1,7 @@
 package com.codegym.exercise.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -11,11 +13,16 @@ public class Country {
     private Long country_id;
     private String country_name;
 
+    @JsonIgnore
     @OneToMany(targetEntity = Customer.class)
     private List<Customer> customers;
 
 
     public Country() {
+    }
+
+    public Country(Long country_id) {
+        this.country_id = country_id;
     }
 
     public Country(String country_name, List<Customer> customers) {
@@ -26,7 +33,7 @@ public class Country {
     public Country(Long country_id, String country_name, List<Customer> customers) {
         this.country_id = country_id;
         this.country_name = country_name;
-        this.customers = customers;
+       this.customers = customers;
     }
 
     public Long getCountry_id() {

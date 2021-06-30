@@ -12,12 +12,13 @@ label{
     border-color: #0d6efd !important;
     margin-top: 30px !important;
 }
+table{
+    margin-top: 20px !important;
+
+}
 .btn-secondary{
      color: #0d6efd !important;
      background-color: white !important;
      border-color: #0d6efd !important;
     margin-top: 30px!important;
  }
-table{
-    margin-top: 20px !important;
-}

@@ -4,80 +4,262 @@ function addNewCustomer() {
     let email = $('#email').val();
     let phone = $('#phone').val();
     let address = $('#address').val();
-    let country = $('#country').val();
+    let country = $('#country_id').val();
+
+    let newCountry = {
+        country_id: country
+    }
+
     let newCustomer = {
         fullName: fullName,
         email: email,
         phone: phone,
         address: address,
-        country: country
-    };
+        country: newCountry
+    }
+    console.log(newCustomer);
     // goi ajax
     $.ajax({
+
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         type: "POST",
         data: JSON.stringify(newCustomer),
-        //tên API
         url: "/customers",
-        //xử lý khi thành công
-        success: successHandler
-    });
-    //chặn sự kiện mặc định của thẻ
-    event.preventDefault();
-}
+        success: function (customer) {
+            $('#customerList tbody').prepend(`<tr id="row${customer.id}">
+                        <td>${customer.id}</td>
+                        <td>${customer.fullName}</td>
+                        <td>${customer.email}</td>
+                        <td>${customer.phone}</td>
+                        <td>${customer.address}</td>
+                        <td>${customer.country.country_name}</td>
+                        <td>
+                            <button value="${customer.id}" class="btn btn-outline-primary updateCustomer" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="far fa-edit"></i>Edit</button>
+                            <a value="${customer.id}" type="button" class="btn btn-outline-danger deleteCustomer" ><i  class="fas fa-trash-alt"></i>Delete</a>
+                        </td>
+                    </tr>`);
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'Your customer has been created!',
+                showConfirmButton: false,
+                timer: 1500
+            })
 
-function successHandler() {
-    $.ajax({
-        type: "GET",
-        //tên API
-        url: "/customers",
-        //xử lý khi thành công
-        success: function (data) {
-            // hien thi danh sach o day
-            let content = '    <tr>\n' +
-                '        <td>#</td>\n' +
-                '        <td>Name</td>\n' +
-                '        <td>Phone</td>\n' +
-                '        <td>Email</td>\n' +
-                '        <td>Address</td>\n' +
-                '        <td>Country</td>\n' +
-                '        <td>Acction</td>\n' +
-                '    </tr>';
-            for (let i = 0; i < data.length; i++) {
-                content += getCustomer(data[i]);
-            }
-            document.getElementById('customerList').innerHTML = content;
+            $('.updateCustomer').on('click', function () {
+                let a = $(this);
+                let customerId = a.attr("value");
+                console.log(customerId);
+                $.ajax({
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    type: "GET",
+                    url: `/edit-customer/${customerId}`,
+                    success: function (customer) {
+                        $('#upID').val(customer.id);
+                        $('#upFullName').val(customer.fullName);
+                        $('#upEmail').val(customer.email);
+                        $('#upPhone').val(customer.phone);
+                        $('#upAddress').val(customer.address);
+                        $('#upCountry').val(customer.country.country_id);
+                    }
+                })
+            })
+
+            $('.save-customer').on('click',function (){
+                let id = $('#upID').val();
+                console.log(id);
+                let fullName = $('#upFullName').val();
+                let email = $('#upEmail').val();
+                let phone = $('#upPhone').val();
+                let address = $('#upAddress').val();
+                let country = $('#upCountry').val();
+
+                let newCountry = {
+                    country_id: country
+                }
+
+                let newCustomer = {
+                    id:id,
+                    fullName: fullName,
+                    email: email,
+                    phone: phone,
+                    address: address,
+                    country: newCountry
+                }
+                $.ajax({
+
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    type: "PUT",
+                    data: JSON.stringify(newCustomer),
+                    url: `/edit/${id}`,
+                    success: function (customer) {
+                        $('#row'+id+ ' td').remove();
+                        $('#row'+id).html(`
+                        <td>${customer.id}</td>
+                        <td>${customer.fullName}</td>
+                        <td>${customer.email}</td>
+                        <td>${customer.phone}</td>
+                        <td>${customer.address}</td>
+                        <td>${customer.country.country_name}</td>
+                        <td>
+                            <button value="${customer.id}" class="btn btn-outline-primary updateCustomer" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="far fa-edit"></i>Edit</button>
+                            <a value="${customer.id}" type="button" class="btn btn-outline-danger deleteCustomer" ><i  class="fas fa-trash-alt"></i>Delete</a>
+                        </td>`);
+
+                        $('.dismiss-modal').click();
+                        $('#staticBackdrop')[0].reset();
+
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'You have changed successfull',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                    }
+                });
+            })
+
         }
     });
 }
 
-function getCustomer(customer) {
-    return `<tr><td >${customer.fullName}</td><td >${customer.email}</td><td>${customer.phone}</td><td >${customer.address}</td><td >${customer.country}</td>` +
-        `<td><a class="deleteCustomer" href="${customer.id}">Delete</a></td></tr>`;
+$("#customerList").on("click", ".deleteCustomer", function () {
+    let a = $(this);
+    deleteConfirm(a);
+});
+
+function deleteConfirm(id) {
+
+    let customerId = id.attr("value");
+    console.log(customerId);
+    // goi ajax
+
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showDenyButton: true,
+        confirmButtonColor: '#3085d6',
+        denyButtonColor: '#d33',
+        denyButtonText :`Cancel`,
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "DELETE",
+                //tên API
+                url: `/customers/${customerId}`,
+                //xử lý khi thành công
+                success: function (data) {
+                    console.log(`#row${customerId}`);
+                    // $(`#row${data.id}`).html("");
+                    $("#row" + customerId).remove();
+
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+                }
+            })
+        }
+    })
 }
 
-$(document).ready(function () {
-    //sư kiện nào thực hiện Ajax
-    $('.deleteCustomer').click(function (event) {
-        //lay du lieu
-        let a = $(this);
-        let customerId = a.attr("href");
-        // goi ajax
-        $.ajax({
-            type: "DELETE",
-            //tên API
-            url: `/customers/${customerId}`,
-            //xử lý khi thành công
-            success: function (data) {
-                a.parent().parent().remove();
-            }
+// $("#staticBackdrop").on("click", ".updateCustomer", function () {
+//     let a = $(this);
+//     console.log(a.attr("value"));
+//     updateConfirm(a);
+// });
 
-        });
-        //chặn sự kiện mặc định của thẻ
-        event.preventDefault();
-    });
+$('.updateCustomer').on('click', function () {
+    let a = $(this);
+    let customerId = a.attr("value");
+    console.log(customerId);
+    $.ajax({
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        type: "GET",
+        url: `/edit-customer/${customerId}`,
+        success: function (customer) {
+            $('#upID').val(customer.id);
+            $('#upFullName').val(customer.fullName);
+            $('#upEmail').val(customer.email);
+            $('#upPhone').val(customer.phone);
+            $('#upAddress').val(customer.address);
+            $('#upCountry').val(customer.country.country_id);
+        }
+    })
 })
 
+$('.save-customer').on('click',function (){
+    let id = $('#upID').val();
+    console.log(id);
+    let fullName = $('#upFullName').val();
+    let email = $('#upEmail').val();
+    let phone = $('#upPhone').val();
+    let address = $('#upAddress').val();
+    let country = $('#upCountry').val();
+
+    let newCountry = {
+        country_id: country
+    }
+
+    let newCustomer = {
+        id:id,
+        fullName: fullName,
+        email: email,
+        phone: phone,
+        address: address,
+        country: newCountry
+    }
+    $.ajax({
+
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        type: "PUT",
+        data: JSON.stringify(newCustomer),
+        url: `/edit/${id}`,
+        success: function (customer) {
+            $('#row'+id+ ' td').remove();
+            $('#row'+id).html(`
+                        <td>${customer.id}</td>
+                        <td>${customer.fullName}</td>
+                        <td>${customer.email}</td>
+                        <td>${customer.phone}</td>
+                        <td>${customer.address}</td>
+                        <td>${customer.country.country_name}</td>
+                        <td>
+                            <button value="${customer.id}" class="btn btn-outline-primary updateCustomer" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="far fa-edit"></i>Edit</button>
+                            <a value="${customer.id}" type="button" class="btn btn-outline-danger deleteCustomer" ><i  class="fas fa-trash-alt"></i>Delete</a>
+                        </td>`);
+
+            $('.dismiss-modal').click();
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'You have changed successfull',
+                showConfirmButton: false,
+                timer: 1500
+            })
+            $('#staticBackdrop')[0].reset();
+
+
+        }
+    });
+})

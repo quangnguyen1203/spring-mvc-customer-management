@@ -6,5 +6,6 @@ import com.codegym.exercise.service.IGeneralService;
 
 public interface ICustomerService extends IGeneralService<Customer> {
     Iterable<Customer> findAllByCountry(Country country);
+    Iterable<Customer> findAllByOrderByIdDesc();
 }
 

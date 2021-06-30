@@ -5,6 +5,7 @@ import com.codegym.exercise.model.Country;
 import com.codegym.exercise.repository.ICustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.security.pkcs11.P11Util;
 
 import java.util.Optional;
 
@@ -25,8 +26,8 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    public void save(Customer customer) {
-        customerRepository.save(customer);
+    public Customer save(Customer customer) {
+        return customerRepository.save(customer);
     }
 
     @Override
@@ -38,5 +39,11 @@ public class CustomerService implements ICustomerService {
     public Iterable<Customer> findAllByCountry(Country country) {
         return customerRepository.findAllByCountry(country);
     }
+
+    @Override
+    public Iterable<Customer> findAllByOrderByIdDesc() {
+        return customerRepository.findAllByOrderByIdDesc();
+    }
+
 }
 
