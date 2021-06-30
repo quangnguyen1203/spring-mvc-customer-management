@@ -147,7 +147,6 @@ public class CustomerController {
     public ResponseEntity<Customer> editCustomer(@RequestBody Customer customer,@PathVariable Long id){
         customer.setId(id) ;
         customer.getCountry().setCountry_name(countryService.findById(customer.getCountry().getCountry_id()).get().getCountry_name());
-//        customer.getCountry().setCountry_name(countryService.findById(id).get().getCountry_name());
         return new ResponseEntity<>(customerService.save(customer),HttpStatus.OK);
     }
 

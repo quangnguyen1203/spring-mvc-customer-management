@@ -48,7 +48,7 @@ function addNewCustomer() {
                 showConfirmButton: false,
                 timer: 1500
             })
-
+            $('#addNewCustomer')[0].reset();
             $('.updateCustomer').on('click', function () {
                 let a = $(this);
                 let customerId = a.attr("value");
@@ -177,12 +177,6 @@ function deleteConfirm(id) {
     })
 }
 
-// $("#staticBackdrop").on("click", ".updateCustomer", function () {
-//     let a = $(this);
-//     console.log(a.attr("value"));
-//     updateConfirm(a);
-// });
-
 $('.updateCustomer').on('click', function () {
     let a = $(this);
     let customerId = a.attr("value");
@@ -258,8 +252,48 @@ $('.save-customer').on('click',function (){
                 timer: 1500
             })
             $('#staticBackdrop')[0].reset();
-
-
         }
     });
 })
+
+$("#addNewCustomer").validate({
+    errorElement: 'div',
+    rules: {
+        fullName: {
+            required: true,
+            minlength: 5,
+            maxlength: 50
+        },
+        phone: {
+            number: true,
+            minlength: 10,
+            maxlength: 11
+        },
+        email:{
+            required: true,
+            validateEmail:true
+        },
+    },
+    messages: {
+        fullName: {
+            required: "Bắt buộc nhập tên đầy đủ",
+            minlength: "Hãy nhập tối thiểu 5 ký tự",
+            maxlength: "Hãy nhập tối đa 50 ký tự"
+        },
+        phone: {
+            number: "Vui lòng nhập một số hợp lệ",
+            minlength: "Hãy nhập ít nhất 10 chữ số",
+            maxlength: "Hãy nhập tối đã 11 chữ số"
+        },
+        email:{
+            required:"Hãy nhập đúng email"
+        }
+    },
+
+    submitHandler: function(form) {
+        form.submit();
+    }
+});
+$.validator.addMethod("validateEmail", function (value, element) {
+    return this.optional(element) ||/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i.test(value);
+}, "Please enter a password from 8 to 16 characters including uppercase, lowercase and at least one number");
